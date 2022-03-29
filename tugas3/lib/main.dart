@@ -18,15 +18,27 @@ class _MyAppState extends State<MyApp> {
   void Convert() {
     setState(() {
       input = double.parse(controllerUser.text);
-      kelvin = input + 273.15;
-      reamur = (4 / 5 * input);
-      fahrenheit = (9 / 5 * input) + 32;
+      switch (_newValue) {
+        case 'Kelvin':
+          _result = input + 273.15;
+          break;
+        case 'Reamur':
+          _result = (4 / 5 * input);
+          break;
+        case 'Fahrenheit':
+          _result = (9 / 5 * input) + 32;
+      }
     });
   }
 
   double input = 0;
   double kelvin = 0, reamur = 0, fahrenheit = 0;
   final controllerUser = TextEditingController();
+  var listItem = ["Fahrenheit", "Kelvin", "Reamur"];
+  String _newValue = "Kelvin";
+  double _result = 0;
+  List<String> listViewItem = <String>[];
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -42,7 +54,32 @@ class _MyAppState extends State<MyApp> {
         body: ListView(
           children: [
             Input(controllerUser: controllerUser),
-            View(fahrenheit: fahrenheit, reamur: reamur, kelvin: kelvin),
+            View(
+              result: _result,
+            ),
+            DropdownButton<String>(
+              items: listItem.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              value: _newValue,
+              onChanged: (value) {
+                setState(() {
+                  _newValue = value!;
+                  Convert();
+                });
+              },
+            ),
+            ListView.builder(listViewItem.map((String value) {
+              return Container(
+                  margin: EdgeInsets.all(10),
+                  child: Text(
+                    value,
+                    style: TextStyle(fontSize: 15),
+                  ));
+            }).toList()),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(
@@ -59,38 +96,31 @@ class _MyAppState extends State<MyApp> {
 }
 
 class View extends StatelessWidget {
-  const View({
+  View({
     Key? key,
-    required this.fahrenheit,
-    required this.reamur,
-    required this.kelvin,
+    required this.result,
   }) : super(key: key);
 
-  final double fahrenheit;
-  final double reamur;
-  final double kelvin;
-
+  final double result;
   @override
   Widget build(BuildContext context) {
     return Row(children: [
       Container(
-        height: 390,
-        width: 290,
-        alignment: Alignment.topCenter,
-        child: Text('Fahrenheit : ' '$fahrenheit'),
-      ),
-      Container(
-        height: 390,
-        width: 290,
-        alignment: Alignment.topCenter,
-        child: Text('Reamur : ' '$reamur'),
-      ),
-      Container(
-        height: 390,
-        width: 290,
-        alignment: Alignment.topCenter,
-        child: Text('Kelvin : ' '$kelvin'),
-      ),
+        margin: EdgeInsets.only(top: 20, bottom: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Hasil",
+              style: TextStyle(fontSize: 20),
+            ),
+            Text(
+              result.toStringAsFixed(1),
+              style: TextStyle(fontSize: 30),
+            )
+          ],
+        ),
+      )
     ]);
   }
 }
